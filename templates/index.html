@@ -40,8 +40,7 @@
 
     };
 
-    // Board visualization
-    // Game state handling
+    // BOARD VISUALIZATION
 
     var onDragStart = function (source, piece, position, orientation) {
 
@@ -55,31 +54,35 @@
 
         var bestMove = getBestMove(game);
         game.move(bestMove);
+
         board.position(game.fen());
         renderMoveHistory(game.history());
 
         if (game.game_over() && (bestMove !== void(0))) {
-            alert('Game over');
+            var historyElement = $('#move_history');
+            historyElement.append('<div class = "move">' + '>> Computer wins.</div>');
+        }
+        else if (game.game_over()) {
+            var historyElement = $('#move_history');
+            historyElement.append('<div class = "move">' + '>> Human wins.</div>');
         }
 
     };
 
     var getBestMove = function (game) {
-        if (game.game_over()) {
-            alert('Game over');
-        }
+
         var bestMove = calculateBestMove(game);
         return bestMove;
+
     };
 
     var renderMoveHistory = function (moves) {
+
         var historyElement = $('#move_history').empty();
         historyElement.empty();
+
         for (var i = 0; i < moves.length; i = i + 2) {
-
-
-
-            // historyElement.append('<span>' + moves[i] + ' ' + ( moves[i + 1] ? moves[i + 1] : ' ') + '</span><br>');
+            historyElement.append('<div class = "move">' + '>> ' + moves[i] + ( moves[i + 1] ? ' ' + moves[i + 1] : ' ') + '</div>');
         }
 
         historyElement.scrollTop(historyElement[0].scrollHeight);
@@ -101,44 +104,55 @@
 
         renderMoveHistory(game.history());
         window.setTimeout(makeBestMove, 250);
+
     };
 
     var onSnapEnd = function () {
+
         board.position(game.fen());
+
     };
 
     var onMouseoverSquare = function(square, piece) {
-    var moves = game.moves({
-        square: square,
-        verbose: true
-    });
 
-    if (moves.length === 0) return;
+        var moves = game.moves({
+            square: square,
+            verbose: true
+        });
 
-    greySquare(square);
+        if (moves.length === 0) return;
 
-    for (var i = 0; i < moves.length; i++) {
-        greySquare(moves[i].to);
-    }
+        greySquare(square);
+
+        for (var i = 0; i < moves.length; i++) {
+            greySquare(moves[i].to);
+        }
+
     };
 
     var onMouseoutSquare = function(square, piece) {
-    removeGreySquares();
+
+        removeGreySquares();
+
     };
 
     var removeGreySquares = function() {
-    $('#board .square-55d63').css('background', '');
+
+        $('#board .square-55d63').css('background', '');
+        
     };
 
     var greySquare = function(square) {
-    var squareEl = $('#board .square-' + square);
 
-    var background = '#a9a9a9';
-    if (squareEl.hasClass('black-3c85d') === true) {
-        background = '#696969';
-    }
+        var squareEl = $('#board .square-' + square);
 
-    squareEl.css('background', background);
+        var background = '#a9a9a9';
+        if (squareEl.hasClass('black-3c85d') === true) {
+            background = '#696969';
+        }
+
+        squareEl.css('background', background);
+
     };
 
 
