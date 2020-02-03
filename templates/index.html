@@ -32,28 +32,9 @@
 
     // AI
 
-    var calculateBestMove = function(game) {
+    var makeBestMove = function (ai_move) {
 
-        var newGameMoves = game.moves();
-
-        return(newGameMoves[Math.floor(Math.random() * newGameMoves.length)]);
-
-    };
-
-    // BOARD VISUALIZATION
-
-    var onDragStart = function (source, piece, position, orientation) {
-
-        if (game.in_checkmate() === true || game.in_draw() === true || piece.search(/^b/) !== -1) {
-            return(false);
-        }
-
-    };
-
-    var makeBestMove = function () {
-
-        var bestMove = getBestMove(game);
-        game.move(bestMove);
+        game.move(ai_move, {sloppy: true});
 
         board.position(game.fen());
         renderMoveHistory(game.history());
@@ -69,10 +50,32 @@
 
     };
 
-    var getBestMove = function (game) {
+    var getBestMove = function () {
 
-        var bestMove = calculateBestMove(game);
-        return bestMove;
+        $.ajax({
+
+            url : '{{ url_for('ai') }}',
+            type : 'POST',
+
+            data : {
+                'fen' : game.fen()
+            },
+
+            success: function(response) {
+                makeBestMove(response);
+            }
+
+        });
+
+    };
+
+    // BOARD
+
+    var onDragStart = function (source, piece, position, orientation) {
+
+        if (game.in_checkmate() === true || game.in_draw() === true || piece.search(/^b/) !== -1) {
+            return(false);
+        }
 
     };
 
@@ -103,7 +106,7 @@
         }
 
         renderMoveHistory(game.history());
-        window.setTimeout(makeBestMove, 250);
+        window.setTimeout(getBestMove, 250);
 
     };
 
@@ -139,7 +142,7 @@
     var removeGreySquares = function() {
 
         $('#board .square-55d63').css('background', '');
-        
+
     };
 
     var greySquare = function(square) {
